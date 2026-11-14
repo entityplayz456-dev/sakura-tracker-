@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#fbf6f0">
+<meta name="description" content="A calm daily tracker for two goals: protein and calories.">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Sakura">
+<title>Sakura · Daily Goals</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="bloom" viewBox="-24 -24 48 48">
+      <g fill="#f6cfd8" stroke="#e7a6b6" stroke-width=".8">
+        <path id="petal" d="M0 -2 C-7 -7 -9 -17 -4 -21 L0 -17.5 L4 -21 C9 -17 7 -7 0 -2Z"/>
+        <use href="#petal" transform="rotate(72)"/><use href="#petal" transform="rotate(144)"/>
+        <use href="#petal" transform="rotate(216)"/><use href="#petal" transform="rotate(288)"/>
+      </g>
+      <circle r="3.4" fill="#d9809a"/>
+      <g fill="#c4677f"><circle cx="0" cy="-6" r="1"/><circle cx="5.7" cy="-1.9" r="1"/><circle cx="3.5" cy="4.9" r="1"/><circle cx="-3.5" cy="4.9" r="1"/><circle cx="-5.7" cy="-1.9" r="1"/></g>
+    </symbol>
+    <symbol id="bud" viewBox="-8 -12 16 20"><path d="M0 6 C-5 1 -4 -7 0 -10 C4 -7 5 1 0 6Z" fill="#efb3c2" stroke="#e09aac" stroke-width=".8"/></symbol>
+  </defs>
+</svg>
+
+<svg class="branch" viewBox="0 0 320 220" aria-hidden="true">
+  <path d="M320 18 C262 22 222 40 190 70 C160 98 126 112 82 120 C62 124 44 132 30 146" fill="none" stroke="#6b5048" stroke-width="5" stroke-linecap="round"/>
+  <path d="M205 58 C200 84 206 104 220 122" fill="none" stroke="#6b5048" stroke-width="3" stroke-linecap="round"/>
+  <path d="M132 108 C120 92 118 74 124 58" fill="none" stroke="#6b5048" stroke-width="2.5" stroke-linecap="round"/>
+  <use href="#bloom" x="196" y="40" width="44" height="44"/>
+  <use href="#bloom" x="204" y="108" width="36" height="36"/>
+  <use href="#bloom" x="106" y="40" width="34" height="34"/>
+  <use href="#bloom" x="60" y="100" width="40" height="40"/>
+  <use href="#bloom" x="150" y="86" width="30" height="30"/>
+  <use href="#bud" x="22" y="140" width="14" height="18"/>
+  <use href="#bud" x="262" y="22" width="12" height="16"/>
+</svg>
+
+<div id="petals" aria-hidden="true"></div>
+
+<div id="app">
+  <div id="banner" role="alert" hidden></div>
+  <main id="view" tabindex="-1"></main>
+</div>
+
+<nav id="nav" aria-label="Sections">
+  <button data-a="tab" data-v="today"><svg viewBox="0 0 24 24"><path d="M12 3.5c2 2.2 2 4.6 0 6.5-2-1.9-2-4.3 0-6.5zM20.1 9.4c-.9 2.8-3 4-5.6 3.3.9-2.6 3-3.8 5.6-3.3zM16.9 19c-2.9.1-4.6-1.6-4.7-4.3 2.7.1 4.4 1.7 4.7 4.3zM7.1 19c.3-2.6 2-4.2 4.7-4.3-.1 2.7-1.8 4.4-4.7 4.3zM3.9 9.4c2.6-.5 4.7.7 5.6 3.3-2.6.7-4.7-.5-5.6-3.3z"/></svg>Today</button>
+  <button data-a="tab" data-v="calendar"><svg viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>Calendar</button>
+  <button data-a="tab" data-v="weight"><svg viewBox="0 0 24 24"><path d="M4 18l5-6 4 3 7-9"/><path d="M4 21h16"/></svg>Weight</button>
+  <button data-a="tab" data-v="settings"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1"/></svg>Settings</button>
+</nav>
+
+<div id="sheet" class="overlay" hidden><div class="panel" role="dialog" aria-modal="true" aria-labelledby="sheet-title"></div></div>
+<div id="modal" class="overlay" hidden><div class="panel small" role="alertdialog" aria-modal="true" aria-labelledby="modal-title"></div></div>
+<div id="toast" role="status" aria-live="polite"></div>
+<input type="file" id="file" accept=".json,.csv,application/json,text/csv" hidden>
+
+<script src="db.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
