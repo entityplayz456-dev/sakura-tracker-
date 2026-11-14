@@ -17,15 +17,21 @@
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <defs>
     <symbol id="bloom" viewBox="-24 -24 48 48">
-      <g fill="#f6cfd8" stroke="#e7a6b6" stroke-width=".8">
+      <g style="fill:var(--pf);stroke:var(--ps)" stroke-width=".8">
         <path id="petal" d="M0 -2 C-7 -7 -9 -17 -4 -21 L0 -17.5 L4 -21 C9 -17 7 -7 0 -2Z"/>
         <use href="#petal" transform="rotate(72)"/><use href="#petal" transform="rotate(144)"/>
         <use href="#petal" transform="rotate(216)"/><use href="#petal" transform="rotate(288)"/>
       </g>
-      <circle r="3.4" fill="#d9809a"/>
-      <g fill="#c4677f"><circle cx="0" cy="-6" r="1"/><circle cx="5.7" cy="-1.9" r="1"/><circle cx="3.5" cy="4.9" r="1"/><circle cx="-3.5" cy="4.9" r="1"/><circle cx="-5.7" cy="-1.9" r="1"/></g>
+      <circle r="3.4" style="fill:var(--pc)"/>
+      <g style="fill:var(--pd)"><circle cx="0" cy="-6" r="1"/><circle cx="5.7" cy="-1.9" r="1"/><circle cx="3.5" cy="4.9" r="1"/><circle cx="-3.5" cy="4.9" r="1"/><circle cx="-5.7" cy="-1.9" r="1"/></g>
     </symbol>
-    <symbol id="bud" viewBox="-8 -12 16 20"><path d="M0 6 C-5 1 -4 -7 0 -10 C4 -7 5 1 0 6Z" fill="#efb3c2" stroke="#e09aac" stroke-width=".8"/></symbol>
+    <symbol id="leaf" viewBox="-24 -24 48 48">
+      <g transform="rotate(-30)"><path d="M0 20 C-12 8 -11 -10 0 -21 C11 -10 12 8 0 20Z" fill="#a9c48f" stroke="#86a66d" stroke-width="1"/><path d="M0 18 L0 -17" stroke="#86a66d" stroke-width="1"/></g>
+    </symbol>
+    <symbol id="maple" viewBox="-24 -24 48 48">
+      <path d="M0 -21 L4.5 -10 L13 -14.5 L10 -4 L20 -2 L11 4.5 L14 13 L3.5 8.5 L1.2 20 L-1.2 20 L-3.5 8.5 L-14 13 L-11 4.5 L-20 -2 L-10 -4 L-13 -14.5 L-4.5 -10Z" style="fill:var(--mf,#d9673f)" stroke="#a9472b" stroke-width=".8" stroke-linejoin="round"/>
+    </symbol>
+    <symbol id="bud" viewBox="-8 -12 16 20"><path d="M0 6 C-5 1 -4 -7 0 -10 C4 -7 5 1 0 6Z" style="fill:var(--pf);stroke:var(--ps)" stroke-width=".8"/></symbol>
   </defs>
 </svg>
 
@@ -33,13 +39,14 @@
   <path d="M320 18 C262 22 222 40 190 70 C160 98 126 112 82 120 C62 124 44 132 30 146" fill="none" stroke="#6b5048" stroke-width="5" stroke-linecap="round"/>
   <path d="M205 58 C200 84 206 104 220 122" fill="none" stroke="#6b5048" stroke-width="3" stroke-linecap="round"/>
   <path d="M132 108 C120 92 118 74 124 58" fill="none" stroke="#6b5048" stroke-width="2.5" stroke-linecap="round"/>
-  <use href="#bloom" x="196" y="40" width="44" height="44"/>
-  <use href="#bloom" x="204" y="108" width="36" height="36"/>
-  <use href="#bloom" x="106" y="40" width="34" height="34"/>
-  <use href="#bloom" x="60" y="100" width="40" height="40"/>
-  <use href="#bloom" x="150" y="86" width="30" height="30"/>
-  <use href="#bud" x="22" y="140" width="14" height="18"/>
-  <use href="#bud" x="262" y="22" width="12" height="16"/>
+  <path class="snowcap" d="M318 14 C262 18 222 36 190 65 C160 93 126 107 82 115 C64 119 48 126 36 137" fill="none" stroke="#f7f9fc" stroke-width="4" stroke-linecap="round"/>
+  <use class="orn" href="#bloom" x="196" y="40" width="44" height="44"/>
+  <use class="orn" href="#bloom" x="204" y="108" width="36" height="36"/>
+  <use class="orn" href="#bloom" x="106" y="40" width="34" height="34"/>
+  <use class="orn" href="#bloom" x="60" y="100" width="40" height="40"/>
+  <use class="orn" href="#bloom" x="150" y="86" width="30" height="30"/>
+  <use class="bud" href="#bud" x="22" y="140" width="14" height="18"/>
+  <use class="bud" href="#bud" x="262" y="22" width="12" height="16"/>
 </svg>
 
 <div id="petals" aria-hidden="true"></div>

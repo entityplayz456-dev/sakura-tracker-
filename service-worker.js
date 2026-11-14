@@ -1,6 +1,6 @@
 /* Caches only the app shell. Your records live in IndexedDB, which this file never touches. */
 const PREFIX = 'sakura-';
-const VERSION = PREFIX + 'v1';
+const VERSION = PREFIX + 'v2';
 const SHELL = ['./', 'index.html', 'style.css', 'db.js', 'app.js', 'manifest.json', 'icons/icon-192.png', 'icons/icon-512.png', 'icons/icon-maskable-512.png'];
 
 self.addEventListener('install', (e) => {

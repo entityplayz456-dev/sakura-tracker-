@@ -25,13 +25,14 @@ const greet = (h) => h < 5 ? ['こんばんは', 'Good evening'] : h < 11 ? ['�
 
 const ICON_CHECK = '<svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
 const ICON_X = '<svg viewBox="0 0 24 24"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/></svg>';
-const FUJI = `<svg class="fuji" viewBox="0 0 240 120" aria-hidden="true"><circle cx="176" cy="38" r="22" fill="#f6cdd6" opacity=".75"/><path d="M0 120 L82 44 Q96 32 110 44 L196 120Z" fill="#e9dfe3"/><path d="M82 44 Q96 32 110 44 L122 55 L112 52 L104 60 L96 51 L88 59 L80 51 L70 55Z" fill="#fffdfa"/><path d="M120 120 L178 76 Q186 70 194 76 L240 110 L240 120Z" fill="#efe6e8"/><path d="M0 112 Q60 100 120 110 T240 106 L240 120 L0 120Z" fill="#f4ece6"/></svg>`;
+const FUJI = `<svg class="fuji" viewBox="0 0 240 120" aria-hidden="true"><g class="stars" fill="#f3ead2"><circle cx="40" cy="20" r="1.2"/><circle cx="76" cy="10" r="1"/><circle cx="120" cy="24" r="1.4"/><circle cx="214" cy="14" r="1"/><circle cx="150" cy="8" r="1"/><circle cx="20" cy="46" r="1"/></g><circle cx="176" cy="38" r="22" style="fill:var(--sun)" opacity=".8"/><path d="M0 120 L82 44 Q96 32 110 44 L196 120Z" style="fill:var(--mt1)"/><path d="M82 44 Q96 32 110 44 L122 55 L112 52 L104 60 L96 51 L88 59 L80 51 L70 55Z" style="fill:var(--peak)"/><path d="M120 120 L178 76 Q186 70 194 76 L240 110 L240 120Z" style="fill:var(--mt2)"/><path d="M0 112 Q60 100 120 110 T240 106 L240 120 L0 120Z" style="fill:var(--mt3)"/></svg>`;
 
 /* ---------- state ---------- */
 let recs = new Map();            // mirror of IndexedDB "days" store (IDB is the source of truth)
 let tab = 'today', calY, calM, sheetDate = null;
 let wRange = '90', wMode = 'daily';
 let petals = null, dbReady = false, lastToday = todayKey();
+let seasonPref = 'auto', todPref = 'auto', curTheme = '';
 
 const blank = (date) => ({ date, protein: null, calorie: null, weight: null });
 const isEmpty = (r) => r.protein == null && r.calorie == null && r.weight == null;
@@ -225,7 +226,9 @@ function vSettings() {
   const keys = [...recs.keys()].sort(), latest = keys[keys.length - 1], wn = weighIns().length;
   return `<h1 class="serif" style="font-size:28px;margin:14px 2px 14px">Settings</h1>
   <div class="card"><h2>Appearance</h2>
-    <label class="set-row"><span>Falling petals<br><span class="mu sm">Gentle animation in the background</span></span><span class="toggle"><input type="checkbox" data-s="petals" ${petalsOn() ? 'checked' : ''}><i></i></span></label></div>
+    <div class="set-row"><label for="s-season">Season<br><span class="mu sm">Auto follows the Japanese seasons by month</span></label><select id="s-season" class="sel" data-s="season">${[['auto', 'Auto'], ['spring', 'Spring · sakura'], ['summer', 'Summer · leaves'], ['autumn', 'Autumn · maple'], ['winter', 'Winter · snow']].map(([v, l]) => `<option value="${v}" ${seasonPref === v ? 'selected' : ''}>${l}</option>`).join('')}</select></div>
+    <div class="set-row"><label for="s-tod">Colours<br><span class="mu sm">Auto: morning, day, evening and a dark night look</span></label><select id="s-tod" class="sel" data-s="tod"><option value="auto" ${todPref === 'auto' ? 'selected' : ''}>Auto</option><option value="light" ${todPref === 'light' ? 'selected' : ''}>Always light</option></select></div>
+    <label class="set-row"><span>Falling animation<br><span class="mu sm">Now: ${PARTICLE[seasonNow()]}</span></span><span class="toggle"><input type="checkbox" data-s="petals" ${petalsOn() ? 'checked' : ''}><i></i></span></label></div>
   <div class="card"><h2>Your data</h2>
     <div class="kv"><span class="mu">Days with entries</span><b>${recs.size}</b></div>
     <div class="kv"><span class="mu">Weigh-ins</span><b>${wn}</b></div>
@@ -238,7 +241,7 @@ function vSettings() {
     <p>Everything is stored on this device in your browser’s database (IndexedDB). It survives refreshes, closing the app and website updates.</p>
     <p>It is <b>not</b> synced anywhere. Clearing this site’s browser data, uninstalling the browser or changing phones will remove it — so <b>export a JSON backup now and then</b> (once a month is plenty) and keep it in Google Drive or email.</p>
     <p>To restore, tap <b>Import backup</b> and choose the file. You’ll be asked whether to merge or replace before anything changes.</p></div>
-  <p class="mu xs" style="text-align:center;margin:18px 0">Sakura · v1 · works offline</p>`;
+  <p class="mu xs" style="text-align:center;margin:18px 0">Sakura · v2 · works offline</p>`;
 }
 
 /* ---------- day sheet ---------- */
@@ -269,12 +272,37 @@ function ask(title, html, buttons) {
 }
 
 /* ---------- render ---------- */
+/* ---------- seasonal + time-of-day theme ---------- */
+const SEASONS = ['winter', 'winter', 'spring', 'spring', 'spring', 'summer', 'summer', 'summer', 'autumn', 'autumn', 'autumn', 'winter'];
+const seasonNow = () => (seasonPref === 'auto' ? SEASONS[new Date().getMonth()] : seasonPref);
+const todNow = () => { if (todPref === 'light') return 'day'; const h = new Date().getHours(); return h >= 5 && h < 11 ? 'morning' : h < 17 && h >= 11 ? 'day' : h >= 17 && h < 20 ? 'evening' : 'night'; };
+const MAPLE = ['#d9673f', '#e08a3c', '#c9483a', '#e3a542', '#b9432f'];
+const PARTICLE = { spring: 'falling petals', summer: 'drifting leaves', autumn: 'falling maple leaves', winter: 'falling snow' };
+/* petals: follow the OS "reduce motion" setting until the user chooses in Settings */
 const petalsOn = () => (petals == null ? !matchMedia('(prefers-reduced-motion: reduce)').matches : petals);
-function applyPetals() {
-  document.body.classList.toggle('calm', !petalsOn());
-  const box = $('#petals');
-  if (petalsOn() && !box.children.length) {
-    for (let i = 0; i < 9; i++) { const e = document.createElement('i'); e.style.left = (5 + Math.random() * 90) + '%'; e.style.animationDuration = (14 + Math.random() * 14) + 's'; e.style.animationDelay = (-Math.random() * 25) + 's'; e.style.transform = `scale(${0.6 + Math.random() * 0.6})`; box.append(e); }
+function applyTheme(force) {
+  const se = seasonNow(), td = todNow(), key = se + td + petalsOn();
+  if (key === curTheme && !force) return;
+  curTheme = key;
+  const b = document.body;
+  b.classList.remove('spring', 'summer', 'autumn', 'winter', 'tod-morning', 'tod-day', 'tod-evening', 'tod-night');
+  b.classList.add(se, 'tod-' + td);
+  b.classList.toggle('calm', !petalsOn());
+  document.querySelector('meta[name=theme-color]').setAttribute('content', td === 'night' ? '#1d1b27' : '#fbf6f0');
+  const orn = { spring: '#bloom', summer: '#leaf', autumn: '#maple', winter: '#bloom' }[se];
+  document.querySelectorAll('.branch .orn').forEach((u, i) => { u.setAttribute('href', orn); u.style.setProperty('--mf', MAPLE[i % MAPLE.length]); });
+  const box = $('#petals'); box.innerHTML = '';
+  if (!petalsOn()) return;
+  const n = se === 'winter' ? 16 : 12;
+  for (let i = 0; i < n; i++) {
+    const e = document.createElement('i'), sc = 0.7 + Math.random() * 0.6;
+    if (se === 'spring') e.className = 'petal';
+    else if (se === 'winter') e.className = 'snow' + (Math.random() < 0.3 ? ' lg' : '');
+    else { const sz = Math.round((se === 'autumn' ? 18 : 14) * sc); e.style.width = e.style.height = sz + 'px'; e.style.setProperty('--mf', MAPLE[i % MAPLE.length]); e.innerHTML = `<svg viewBox="-24 -24 48 48"><use href="#${se === 'autumn' ? 'maple' : 'leaf'}"/></svg>`; }
+    e.style.left = (2 + Math.random() * 96) + '%';
+    e.style.animationDuration = (se === 'winter' ? 12 : 16) + Math.random() * 14 + 's';
+    e.style.animationDelay = (-Math.random() * 28) + 's';
+    box.append(e);
   }
 }
 function render() {
@@ -380,11 +408,13 @@ document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && sheetDat
 document.addEventListener('change', (e) => {
   const el = e.target;
   if (el.matches('input[data-w]')) saveWeight(el);
-  if (el.dataset.s === 'petals') { petals = el.checked; DB.setMeta('petals', petals).catch(() => {}); applyPetals(); }
+  if (el.dataset.s === 'petals') { petals = el.checked; DB.setMeta('petals', petals).catch(() => {}); applyTheme(true); }
+  if (el.dataset.s === 'season') { seasonPref = el.value; DB.setMeta('season', seasonPref).catch(() => {}); applyTheme(true); }
+  if (el.dataset.s === 'tod') { todPref = el.value; DB.setMeta('tod', todPref).catch(() => {}); applyTheme(true); }
 });
 $('#file').addEventListener('change', (e) => { const f = e.target.files[0]; e.target.value = ''; if (f) importFile(f); });
 /* roll over to the new day if the app stays open past midnight */
-const refresh = () => { const t = todayKey(); if (t !== lastToday) { lastToday = t; if (!sheetDate) render(); } };
+const refresh = () => { applyTheme(); const t = todayKey(); if (t !== lastToday) { lastToday = t; if (!sheetDate) render(); } };
 setInterval(refresh, 30000);
 document.addEventListener('visibilitychange', () => { if (!document.hidden) refresh(); });
 
@@ -395,9 +425,10 @@ document.addEventListener('visibilitychange', () => { if (!document.hidden) refr
     const all = await DB.all();
     recs = new Map(all.map((r) => [r.date, r]));
     petals = (await DB.getMeta('petals')) ?? null;
+    seasonPref = (await DB.getMeta('season')) || 'auto'; todPref = (await DB.getMeta('tod')) || 'auto';
     dbReady = true;
   } catch (e) { dbFail(e, 'Could not open your saved data'); }
-  applyPetals(); render();
+  applyTheme(true); render();
   if ('serviceWorker' in navigator) navigator.serviceWorker.register('service-worker.js').catch((e) => console.warn('SW', e));
 })();
 })();
